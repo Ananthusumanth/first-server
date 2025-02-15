@@ -74,9 +74,9 @@ app.post('/register', async (request, response) => {
           `
       const dbUser = await db.get(getQueryDetails)
       if (dbUser === undefined){
-        const userInvalid = "invalid user"
+        const error_msg = "invalid user"
         response.status(400)
-        response.send({userInvalid})
+        response.send({error_msg})
       }else {
         const comparePassword = await bcrypt.compare(password, dbUser.password)
         if (comparePassword){
