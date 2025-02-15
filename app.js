@@ -74,7 +74,9 @@ app.post('/register', async (request, response) => {
           `
       const dbUser = await db.get(getQueryDetails)
       if (dbUser === undefined){
-        response.send("invalid user")
+        const userInvalid = "invalid user"
+        response.status(400)
+        response.send({userInvalid})
       }else {
         const comparePassword = await bcrypt.compare(password, dbUser.password)
         if (comparePassword){
@@ -82,9 +84,11 @@ app.post('/register', async (request, response) => {
             username: username,
           };
           const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
+          response.status(200)
           response.send({ jwtToken });
         }else {
           const error_msg = "invaild password"
+          response.status(400)
           response.send({error_msg})
         }
       }
