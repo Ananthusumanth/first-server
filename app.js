@@ -69,8 +69,6 @@ app.post('/register', async (request, response) => {
 
   app.post("/login", async (request, response) => {
     const {username, password} = request.body
-    console.log(username)
-    console.log(password)
     const getQueryDetails = `
           SELECT * FROM user WHERE username = '${username}'
           `
@@ -86,7 +84,8 @@ app.post('/register', async (request, response) => {
           const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
           response.send({ jwtToken });
         }else {
-          response.send("invaild password")
+          const error_msg = "invaild password"
+          response.send({error_msg})
         }
       }
   })
