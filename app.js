@@ -4,6 +4,7 @@ const path = require('path')
 const {open} = require('sqlite')
 const sqlite3 = require('sqlite3')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -68,6 +69,8 @@ app.post('/register', async (request, response) => {
 
   app.post("/login", async (request, response) => {
     const {username, password} = request.body
+    console.log(username)
+    console.log(password)
     const getQueryDetails = `
           SELECT * FROM user WHERE username = '${username}'
           `
@@ -77,7 +80,11 @@ app.post('/register', async (request, response) => {
       }else {
         const comparePassword = await bcrypt.compare(password, dbUser.password)
         if (comparePassword){
-          response.send("login Success")
+          const payload = {
+            username: username,
+          };
+          const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
+          response.send({ jwtToken });
         }else {
           response.send("invaild password")
         }
