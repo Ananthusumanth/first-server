@@ -33,8 +33,9 @@ initlizDBAndServer()
 app.post('/register', async (request, response) => {
     const {username, password} = request.body
     if (password.length < 5) {
+      const error_msg = 'Password is too short'
       response.status(400)
-      response.send('Password is too short')
+      response.send({error_msg})
     } else {
       const hashPassword = await bcrypt.hash(password, 10)
       const getQueryDetails = `
@@ -50,11 +51,13 @@ app.post('/register', async (request, response) => {
               )
               `
         await db.run(createUserDetails)
+        const success = 'User created successfully'
         response.status(200)
-        response.send('User created successfully')
+        response.send({success})
       } else {
+        const error_msg = 'User already exists'
         response.status(400)
-        response.send('User already exists')
+        response.send({error_msg})
       }
     }
   });
@@ -83,15 +86,52 @@ app.post('/register', async (request, response) => {
           const payload = {
             username: username,
           };
-          const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
+          const jwt_token = jwt.sign(payload, "MY_SECRET_TOKEN");
           response.status(200)
-          response.send({ jwtToken });
+          response.send({ jwt_token });
         }else {
           const error_msg = "invaild password"
           response.status(400)
           response.send({error_msg})
         }
       }
+  })
+
+  app.put('/change-password', async (request, response) => {
+    const {username, oldPassword, newPassword} = request.body
+    if (newPassword.length < 5 || oldPassword.length < 5) {
+      const error_msg = 'Password is too short'
+      response.status(400)
+      response.send({error_msg})
+    } else {
+      const getQueryDetails = `
+      SELECT * FROM user WHERE username = '${username}'
+      `
+      const dbUser = await db.get(getQueryDetails)
+      if (dbUser === undefined) {
+        const error_msg = 'Invalid user'
+        response.status(400)
+        response.send({error_msg})
+      } else {
+        const comparePassword = await bcrypt.compare(oldPassword, dbUser.password)
+        if (comparePassword === true) {
+          const hashPassword = await bcrypt.hash(newPassword, 10)
+          const updatePasswordDetails = `
+          UPDATE user 
+          SET 
+          password = '${hashPassword}'
+          `
+          await db.run(updatePasswordDetails)
+          const success = 'Password updated'
+          response.status(200)
+          response.send({success})
+        } else {
+          const error_msg = 'Invalid current password'
+          response.status(400)
+          response.send({error_msg})
+        }
+      }
+    }
   })
 
 
