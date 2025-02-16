@@ -5,6 +5,7 @@ const {open} = require('sqlite')
 const sqlite3 = require('sqlite3')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const { request } = require('http')
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -100,7 +101,7 @@ app.post('/register', async (request, response) => {
   app.put('/change-password', async (request, response) => {
     const {username, oldPassword, newPassword} = request.body
     if (newPassword.length < 5 || oldPassword.length < 5) {
-      const error_msg = 'Password is too short'
+      const error_msg = 'Password is too short(<5)'
       response.status(400)
       response.send({error_msg})
     } else {
@@ -120,6 +121,7 @@ app.post('/register', async (request, response) => {
           UPDATE user 
           SET 
           password = '${hashPassword}'
+          WHERE id = ${dbUser.id}
           `
           await db.run(updatePasswordDetails)
           const success = 'Password updated'
@@ -132,6 +134,35 @@ app.post('/register', async (request, response) => {
         }
       }
     }
+  })
+
+  app.delete("/delete", async (request, response) => {
+    const {username, password} = request.body
+    const getQueryDetails = `
+      SELECT * FROM user WHERE username = '${username}'
+    `
+    const dbUser = await db.get(getQueryDetails)
+    if (dbUser !== undefined){
+      const comparePassword = await bcrypt.compare(password, dbUser.password)
+      if (comparePassword){
+        const getDetails = `
+          DELETE FROM user WHERE id = ${dbUser.id}
+        `
+        await db.run(getDetails)
+        const success = "user deleted successfully"
+        response.status(200)
+        response.send({success})
+      }else {
+        const error_msg = "invalid password"
+        response.status(400)
+        response.send({error_msg})
+      }
+    }else {
+      const error_msg = "user notfound"
+      response.status(400)
+      response.send({error_msg})
+    }
+    
   })
 
 

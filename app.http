@@ -2,29 +2,39 @@ POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "username": "Sumanth",
-  "password": "Sanath143"
+  "username": "Sanath",
+  "password": "Sanath3"
 }
 
-###
+####
 GET http://localhost:3000/
 
-###
+####
 POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "username": "Sanath",
-  "password": "Sanath"
+  "username": "Sumanth",
+  "password": "Sanath143"
 }
 
-###
+####
 
 PUT http://localhost:3000/change-password
 Content-Type: application/json
 
 {
   "username": "Sanath",
-  "oldPassword": "Sanath15",
-  "newPassword": "Sanath"
+  "oldPassword": "Sanath3",
+  "newPassword": "Sanath15"
+}
+
+####
+
+DELETE http://localhost:3000/delete
+Content-Type: application/json
+
+{
+  "username" : "Sanath",
+  "password" : "Sanath1"
 }
