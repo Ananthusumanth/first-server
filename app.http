@@ -38,3 +38,18 @@ Content-Type: application/json
   "username" : "Sanath",
   "password" : "Sanath1"
 }
+
+###
+
+GET http://localhost:3000/note
+
+####
+
+POST http://localhost:3000/add
+Content-Type: application/json
+
+{
+  "title": "India",
+  "content": "India has more Power",
+  "category": "work"
+}

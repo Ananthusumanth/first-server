@@ -168,6 +168,62 @@ app.post('/register', async (request, response) => {
     
   })
 
+  app.get("/note", async (request, response) => {
+    const getDetails = `
+      SELECT * FROM notes
+    `
+    const dbUser = await db.all(getDetails)
+    response.status(200)
+    response.send(dbUser)
+  })
+
+  app.post("/add", async (request, response) => {
+    const {title, content, category} = request.body
+    const createUserDetails = `
+    INSERT INTO notes (title, content, category, created_at, updated_at)
+    VALUES (
+        '${title}',
+        '${content}',
+        '${category}',
+        '${new Date()}',
+        '${new Date()}'
+    )
+    `
+    await db.run(createUserDetails)
+    const success = 'Add successfully'
+    response.status(200)
+    response.send({success})
+  })
+
+  app.delete("/note/delete", async (request, response) => {
+    const {id} = request.body
+    const getDetails = `
+      DELETE FROM notes WHERE id = ${id}
+    `
+    await db.run(getDetails)
+    const success = "id deleted successfully"
+    response.status(200)
+    response.send({success})
+
+  })
+
+  app.put("/save", async (request, response) => {
+    const {id, title, content, category} = request.body
+    const updatePasswordDetails = `
+    UPDATE notes
+    SET 
+    title = '${title}',
+    content = '${content}',
+    category = '${category}',
+    updated_at = '${new Date()}'
+    WHERE id = ${id}
+    `
+    await db.run(updatePasswordDetails)
+    const success = 'updated successfully'
+    response.status(200)
+    response.send({success})
+  })
+
 
 
   module.export = app
