@@ -32,7 +32,7 @@ initlizDBAndServer()
 
 
 app.post('/register', async (request, response) => {
-    const {username, password} = request.body
+    const {username, email, password} = request.body
     if (password.length < 5) {
       const error_msg = 'Password is too short'
       response.status(400)
@@ -40,15 +40,18 @@ app.post('/register', async (request, response) => {
     } else {
       const hashPassword = await bcrypt.hash(password, 10)
       const getQueryDetails = `
-          SELECT * FROM user WHERE username = '${username}'
+          SELECT * FROM user WHERE email = '${email}'
           `
       const dbUser = await db.get(getQueryDetails)
       if (dbUser === undefined) {
+        const created_at = new Date()
         const createUserDetails = `
-              INSERT INTO user (username, password)
+              INSERT INTO user (username, email, password, created_at)
               VALUES (
                   '${username}',
-                  '${hashPassword}'
+                  '${email}',
+                  '${hashPassword}',
+                  '${created_at}'
               )
               `
         await db.run(createUserDetails)
@@ -56,7 +59,7 @@ app.post('/register', async (request, response) => {
         response.status(200)
         response.send({success})
       } else {
-        const error_msg = 'User already exists'
+        const error_msg = 'email already exists'
         response.status(400)
         response.send({error_msg})
       }
@@ -72,20 +75,20 @@ app.post('/register', async (request, response) => {
   })
 
   app.post("/login", async (request, response) => {
-    const {username, password} = request.body
+    const {email, password} = request.body
     const getQueryDetails = `
-          SELECT * FROM user WHERE username = '${username}'
+          SELECT * FROM user WHERE email = '${email}'
           `
       const dbUser = await db.get(getQueryDetails)
       if (dbUser === undefined){
-        const error_msg = "invalid user"
+        const error_msg = "invalid email"
         response.status(400)
         response.send({error_msg})
       }else {
         const comparePassword = await bcrypt.compare(password, dbUser.password)
         if (comparePassword){
           const payload = {
-            username: username,
+            email: email,
           };
           const jwt_token = jwt.sign(payload, "MY_SECRET_TOKEN");
           response.status(200)
@@ -99,18 +102,18 @@ app.post('/register', async (request, response) => {
   })
 
   app.put('/change-password', async (request, response) => {
-    const {username, oldPassword, newPassword} = request.body
+    const {email, oldPassword, newPassword} = request.body
     if (newPassword.length < 5 || oldPassword.length < 5) {
       const error_msg = 'Password is too short(<5)'
       response.status(400)
       response.send({error_msg})
     } else {
       const getQueryDetails = `
-      SELECT * FROM user WHERE username = '${username}'
+      SELECT * FROM user WHERE email = '${email}'
       `
       const dbUser = await db.get(getQueryDetails)
       if (dbUser === undefined) {
-        const error_msg = 'Invalid user'
+        const error_msg = 'Invalid email'
         response.status(400)
         response.send({error_msg})
       } else {
@@ -137,9 +140,9 @@ app.post('/register', async (request, response) => {
   })
 
   app.delete("/delete", async (request, response) => {
-    const {username, password} = request.body
+    const {email, password} = request.body
     const getQueryDetails = `
-      SELECT * FROM user WHERE username = '${username}'
+      SELECT * FROM user WHERE email = '${email}'
     `
     const dbUser = await db.get(getQueryDetails)
     if (dbUser !== undefined){
