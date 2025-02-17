@@ -53,3 +53,25 @@ Content-Type: application/json
   "content": "India has more Power",
   "category": "work"
 }
+
+
+#### 
+
+DELETE http://localhost:3000/note/delete
+Content-Type: application/json
+
+{
+  "id": 1
+}
+
+####
+
+PUT http://localhost:3000/save
+Content-Type: application/json
+
+{
+  "id": 1,
+  "title": "India",
+  "content": "India has more Power",
+  "category": "work"
+}
