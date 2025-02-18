@@ -41,11 +41,11 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/note
+GET http://localhost:3000/notes
 
 ####
 
-POST http://localhost:3000/add
+POST http://localhost:3000/notes
 Content-Type: application/json
 
 {
@@ -55,22 +55,16 @@ Content-Type: application/json
 }
 
 
-#### 
+####
 
-DELETE http://localhost:3000/note/delete
-Content-Type: application/json
-
-{
-  "id": 1
-}
+DELETE http://localhost:3000/notes/2
 
 ####
 
-PUT http://localhost:3000/save
+PUT http://localhost:3000/notes/1
 Content-Type: application/json
 
 {
-  "id": 1,
   "title": "India",
   "content": "India has more Power",
   "category": "work"

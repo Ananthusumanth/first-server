@@ -168,7 +168,7 @@ app.post('/register', async (request, response) => {
     
   })
 
-  app.get("/note", async (request, response) => {
+  app.get("/notes", async (request, response) => {
     const getDetails = `
       SELECT * FROM notes
     `
@@ -177,7 +177,7 @@ app.post('/register', async (request, response) => {
     response.send(dbUser)
   })
 
-  app.post("/add", async (request, response) => {
+  app.post("/notes", async (request, response) => {
     const {title, content, category} = request.body
     const createUserDetails = `
     INSERT INTO notes (title, content, category, created_at, updated_at)
@@ -195,10 +195,10 @@ app.post('/register', async (request, response) => {
     response.send({success})
   })
 
-  app.delete("/note/delete", async (request, response) => {
-    const {id} = request.body
+  app.delete("/notes/:id", async (request, response) => {
+    const {id} = request.params
     const getDetails = `
-      DELETE FROM notes WHERE id = ${id}
+    DELETE FROM notes WHERE id = ${id}
     `
     await db.run(getDetails)
     const success = "id deleted successfully"
@@ -207,8 +207,9 @@ app.post('/register', async (request, response) => {
 
   })
 
-  app.put("/save", async (request, response) => {
-    const {id, title, content, category} = request.body
+  app.put("/notes/:id", async (request, response) => {
+    const {id} = request.params
+    const {title, content, category} = request.body
     const updatePasswordDetails = `
     UPDATE notes
     SET 
